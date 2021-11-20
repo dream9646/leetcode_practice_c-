@@ -1,0 +1,93 @@
+一、BFS
+遍历每一个元素，从每个元素开始向其上下左右四个元素进行广度优先遍历，找出每一个‘1’元素并将每一个‘1’元素置为‘0’，直到遍历不到‘1’为止，即为一个岛屿。
+
+时间复杂度：O(mn)，m、n分别为网格行数和列数。
+空间复杂度：O(mn)。
+
+void bfs(char** grid, int x, int y, int row, int col){          //广度优先遍历函数
+    int* queue = (int*)malloc(sizeof(int) * row * col);         //利用队列储存元素下标
+    int front = 0, rear = 0;                                    //队头和队尾指针
+    int code = x * col + y;                                     //下标为i、j两个值，则将这两个值转为一个值储存
+
+    grid[x][y] = '0';                                           //将遍历的元素置为‘0’
+    queue[rear++] = code;                                       //下标入队
+    while(front != rear){                                       
+        code = queue[front++];                                  //取队头元素
+        int i = code / col;                                     //转回为下标
+        int j = code % col;
+        if(i > 0 && grid[i-1][j] == '1'){                       //遍历其上下左右的元素
+            grid[i-1][j] = '0';                                 //遍历的元素都置‘0’
+            queue[rear++] = (i - 1) * col + j;
+        }
+        if(j > 0 && grid[i][j-1] == '1'){
+            grid[i][j-1] = '0';
+            queue[rear++] = i * col + (j - 1);
+        }
+        if(i < row-1 && grid[i+1][j] == '1'){
+            grid[i+1][j] = '0';
+            queue[rear++] = (i + 1) * col + j;
+        }
+        if(j < col-1 && grid[i][j+1] == '1'){
+            grid[i][j+1] = '0';
+            queue[rear++] = i * col + (j + 1);
+        }
+    }
+}
+
+int numIslands(char** grid, int gridSize, int* gridColSize){
+    if(grid == NULL)                                            //网格为空
+        return 0;
+    
+    int count = 0;                                              //记数
+
+    for(int i=0; i < gridSize; ++i){                            //遍历每一个元素
+        for(int j=0; j < *gridColSize; ++j){
+            if(grid[i][j] == '1'){                              //若为‘1’
+                ++count;
+                bfs(grid, i, j, gridSize, *gridColSize);        //向其上下左右进行广度优先遍历
+            }
+        }
+    }
+
+    return count;
+}
+二、DFS
+思路类似于BFS，将广度优先遍历改为使用深度优先遍历。
+
+时间复杂度：O(mn)。
+空间复杂度：O(mn)。
+
+void dfs(char** grid, int x, int y, int m, int n){				//深度优先遍历函数
+    if(x < 0 || x >= m || y < 0 || y >= n || grid[x][y] == '0')	//遇到边界或‘0’直接返回
+    	return ;
+    
+    grid[x][y] = '0';											//遍历的元素都置为‘0’
+    dfs(grid, x-1, y, m, n);									//下面的元素
+    dfs(grid, x+1, y, m, n);									//上面的元素
+    dfs(grid, x, y-1, m, n);									//左边的元素
+    dfs(grid, x, y+1, m, n);									//右边的元素
+}
+
+int numIslands(char** grid, int gridSize, int* gridColSize){
+	if(grid == NULL)											//网格为空
+    	return 0;
+    
+    int count = 0;												//记数
+
+    for(int i=0; i < gridSize; ++i){							//遍历网格所以元素
+        for(int j=0; j < *gridColSize; ++j){
+            if(grid[i][j] == '1'){
+                ++count;
+                dfs(grid, i, j, gridSize, *gridColSize);		//深度优先遍历
+            }
+        }
+    }
+
+	return count;
+}
+写解题仅为自我回顾，如有错误敬请指出。
+
+作者：condescending-jangbuv
+链接：https://leetcode-cn.com/problems/number-of-islands/solution/200-dao-yu-shu-liang-by-condescending-ja-0d39/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
